@@ -30,7 +30,8 @@ class P2SH {
       data.hash = data.output!.sublist(2, 22);
       _getDataFromHash();
     } else if (data.input != null) {
-      // TODO: We don't need this at the moment, let's not implement it just yet
+      List<dynamic> chunks = bscript.decompile(data.input) ?? [];
+      _getDataFromChunk(chunks);
     } else {
       throw ArgumentError("Not enough data");
     }
@@ -57,6 +58,7 @@ class P2SH {
       final payload = Uint8List(21);
       payload[0] = network.scriptHash;
       payload.setRange(1, payload.length, data.hash!);
+      data.address = bs58check.encode(payload);
     }
     data.output = bscript.compile([
       OPS['OP_HASH160'],
@@ -64,6 +66,8 @@ class P2SH {
       OPS['OP_EQUAL'],
     ]);
   }
+
+  void _getDataFromChunk([List? chunks]) {}
 }
 
 isValidOutput(Uint8List data) {

@@ -1,53 +1,39 @@
-import 'package:flutter_bitcoin/src/payments/index.dart' show PaymentData;
-import 'package:flutter_bitcoin/src/payments/p2pkh.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:flutter_bitcoin/src/payments/p2sh.dart';
 import 'package:test/test.dart';
 import 'package:flutter_bitcoin/src/utils/script.dart' as bscript;
-import 'dart:io';
-import 'dart:convert';
+import 'package:flutter_bitcoin/src/payments/index.dart' show PaymentData;
 import 'package:hex/hex.dart';
-import 'dart:typed_data';
 
 main() {
   final fixtures = json.decode(
-      File("./test/fixtures/p2pkh.json").readAsStringSync(encoding: utf8));
+      File("./test/fixtures/p2sh.json").readAsStringSync(encoding: utf8));
+
   group('(valid case)', () {
     for (var f in (fixtures["valid"] as List<dynamic>)) {
       test(f['description'] + ' as expected', () {
         final arguments = _preformPaymentData(f['arguments']);
-        final p2pkh = P2PKH(data: arguments);
+        final p2sh = P2SH(data: arguments);
         if (arguments.address == null) {
-          expect(p2pkh.data.address, f['expected']['address']);
+          expect(p2sh.data.address, f['expected']['address']);
         }
         if (arguments.hash == null) {
-          expect(_toString(p2pkh.data.hash), f['expected']['hash']);
+          expect(_toString(p2sh.data.hash), f['expected']['hash']);
         }
         if (arguments.pubkey == null) {
-          expect(_toString(p2pkh.data.pubkey), f['expected']['pubkey']);
+          expect(_toString(p2sh.data.pubkey), f['expected']['pubkey']);
         }
         if (arguments.input == null) {
-          expect(_toString(p2pkh.data.input), f['expected']['input']);
+          expect(_toString(p2sh.data.input), f['expected']['input']);
         }
         if (arguments.output == null) {
-          expect(_toString(p2pkh.data.output), f['expected']['output']);
+          expect(_toString(p2sh.data.output), f['expected']['output']);
         }
         if (arguments.signature == null) {
-          expect(_toString(p2pkh.data.signature), f['expected']['signature']);
-        }
-      });
-    }
-  });
-  group('(invalid case)', () {
-    for (var f in (fixtures["invalid"] as List<dynamic>)) {
-      test(
-          'throws ' +
-              f['exception'] +
-              (f['description'] != null ? ('for ' + f['description']) : ''),
-          () {
-        final arguments = _preformPaymentData(f['arguments']);
-        try {
-          expect(P2PKH(data: arguments), isArgumentError);
-        } catch (err) {
-          expect((err as ArgumentError).message, f['exception']);
+          expect(_toString(p2sh.data.signature), f['expected']['signature']);
         }
       });
     }

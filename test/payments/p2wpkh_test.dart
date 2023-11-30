@@ -1,15 +1,16 @@
-import 'package:flutter_bitcoin/src/payments/index.dart' show PaymentData;
-import 'package:flutter_bitcoin/src/payments/p2wpkh.dart';
-import 'package:test/test.dart';
-import 'package:flutter_bitcoin/src/utils/script.dart' as bscript;
-import 'dart:io';
 import 'dart:convert';
-import 'package:hex/hex.dart';
+import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter_bitcoin/src/payments/index.dart' show PaymentData;
+import 'package:flutter_bitcoin/src/payments/p2wpkh.dart';
+import 'package:flutter_bitcoin/src/utils/script.dart' as bscript;
+import 'package:hex/hex.dart';
+import 'package:test/test.dart';
+
 main() {
-  final fixtures =
-      json.decode(File("./test/fixtures/p2wpkh.json").readAsStringSync(encoding: utf8));
+  final fixtures = json.decode(
+      File("./test/fixtures/p2wpkh.json").readAsStringSync(encoding: utf8));
 
   group('(valid case)', () {
     for (var f in (fixtures["valid"] as List<dynamic>)) {
@@ -46,7 +47,8 @@ main() {
       test(
           'throws ' +
               f['exception'] +
-              (f['description'] != null ? ('for ' + f['description']) : ''), () {
+              (f['description'] != null ? ('for ' + f['description']) : ''),
+          () {
         final arguments = _preformPaymentData(f['arguments']);
         try {
           expect(P2WPKH(data: arguments), isArgumentError);
@@ -60,18 +62,24 @@ main() {
 
 PaymentData _preformPaymentData(dynamic x) {
   final address = x['address'];
-  final hash = x['hash'] != null ? Uint8List.fromList(HEX.decode(x['hash'])) : null;
+  final hash =
+      x['hash'] != null ? Uint8List.fromList(HEX.decode(x['hash'])) : null;
   final input = x['input'] != null ? bscript.fromASM(x['input']) : null;
   final witness = x['witness'] != null
-      ? (x['witness'] as List<dynamic>).map((e) => HEX.decode(e.toString()) as Uint8List).toList()
+      ? (x['witness'] as List<dynamic>)
+          .map((e) => HEX.decode(e.toString()) as Uint8List)
+          .toList()
       : null;
   final output = x['output'] != null
       ? bscript.fromASM(x['output'])
       : x['outputHex'] != null
           ? Uint8List.fromList(HEX.decode(x['outputHex']))
           : null;
-  final pubkey = x['pubkey'] != null ? Uint8List.fromList(HEX.decode(x['pubkey'])) : null;
-  final signature = x['signature'] != null ? Uint8List.fromList(HEX.decode(x['signature'])) : null;
+  final pubkey =
+      x['pubkey'] != null ? Uint8List.fromList(HEX.decode(x['pubkey'])) : null;
+  final signature = x['signature'] != null
+      ? Uint8List.fromList(HEX.decode(x['signature']))
+      : null;
   return PaymentData(
       address: address,
       hash: hash,
