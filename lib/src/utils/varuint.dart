@@ -2,7 +2,7 @@ import 'check_types.dart';
 import 'dart:typed_data';
 
 Uint8List encode(int number, [Uint8List? buffer, int? offset]) {
-  if (!isUint(number, 53)) ;
+  if (!isUint(number, 53)) {}
 
   buffer = buffer ?? Uint8List(encodingLength(number));
   offset = offset ?? 0;

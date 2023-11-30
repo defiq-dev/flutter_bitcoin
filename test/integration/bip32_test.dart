@@ -17,7 +17,7 @@ void main() {
           xpriv,
           bip32.NetworkType(
               wif: testnet.wif,
-              bip32: new bip32.Bip32Type(
+              bip32: bip32.Bip32Type(
                   public: testnet.bip32.public, private: testnet.bip32.private)));
       expect(node.toWIF(), 'cQfoY67cetFNunmBUX5wJiw3VNoYx3gG9U9CAofKE6BfiV1fSRw7');
     });

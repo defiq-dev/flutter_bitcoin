@@ -18,28 +18,31 @@ class Address {
 
   static Uint8List addressToOutputScript(String address, [NetworkType? nw]) {
     NetworkType network = nw ?? bitcoin;
-    var decodeBase58;
-    var decodeBech32;
+    Uint8List? decodeBase58;
+    Segwit? decodeBech32;
     try {
       decodeBase58 = bs58check.decode(address);
-    } catch (err) {}
+    } catch (err) {
+      // TODO: Do something here
+    }
     if (decodeBase58 != null) {
-      if (decodeBase58[0] != network.pubKeyHash)
-        throw new ArgumentError('Invalid version or Network mismatch');
-      P2PKH p2pkh = new P2PKH(data: new PaymentData(address: address), network: network);
+      if (decodeBase58[0] != network.pubKeyHash) {
+        throw ArgumentError('Invalid version or Network mismatch');
+      }
+      P2PKH p2pkh = P2PKH(data: PaymentData(address: address), network: network);
       return p2pkh.data.output!;
     } else {
       try {
         decodeBech32 = segwit.decode(address);
-      } catch (err) {}
-      if (decodeBech32 != null) {
-        if (network.bech32 != decodeBech32.hrp)
-          throw new ArgumentError('Invalid prefix or Network mismatch');
-        if (decodeBech32.version != 0) throw new ArgumentError('Invalid address version');
-        P2WPKH p2wpkh = new P2WPKH(data: new PaymentData(address: address), network: network);
-        return p2wpkh.data.output!;
+      } catch (err) {
+        // TODO: Do something here
       }
+      if (network.bech32 != decodeBech32?.hrp) {
+        throw ArgumentError('Invalid prefix or Network mismatch');
+      }
+      if (decodeBech32?.version != 0) throw ArgumentError('Invalid address version');
+      P2WPKH p2wpkh = P2WPKH(data: PaymentData(address: address), network: network);
+      return p2wpkh.data.output!;
     }
-    throw new ArgumentError(address + ' has no matching Script');
   }
 }

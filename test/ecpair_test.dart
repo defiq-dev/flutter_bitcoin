@@ -3,13 +3,13 @@ import 'package:hex/hex.dart';
 import 'dart:typed_data';
 import 'dart:io';
 import 'dart:convert';
-import '../lib/src/ecpair.dart' show ECPair;
-import '../lib/src/models/networks.dart' as NETWORKS;
+import 'package:flutter_bitcoin/src/ecpair.dart' show ECPair;
+import 'package:flutter_bitcoin/src/models/networks.dart' as networks;
 
 final ONE = HEX.decode('0000000000000000000000000000000000000000000000000000000000000001');
 
 main() {
-  final fixtures = json.decode(new File('test/fixtures/ecpair.json').readAsStringSync(encoding: utf8));
+  final fixtures = json.decode(File('test/fixtures/ecpair.json').readAsStringSync(encoding: utf8));
   group('ECPair', () {
     group('fromPrivateKey', () {
       test('defaults to compressed', () {
@@ -21,17 +21,17 @@ main() {
         expect(keyPair.compressed, false);
       });
       test('supports the network option', () {
-        final keyPair = ECPair.fromPrivateKey(Uint8List.fromList(ONE), network: NETWORKS.testnet, compressed: false);
-        expect(keyPair.network, NETWORKS.testnet);
+        final keyPair = ECPair.fromPrivateKey(Uint8List.fromList(ONE), network: networks.testnet, compressed: false);
+        expect(keyPair.network, networks.testnet);
       });
-      (fixtures['valid'] as List).forEach((f) {
+      for (var f in (fixtures['valid'] as List)) {
         test('derives public key for ${f['WIF']}', () {
           final d = Uint8List.fromList(HEX.decode(f['d']));
           final keyPair = ECPair.fromPrivateKey(d, compressed: f['compressed']);
           expect(HEX.encode(keyPair.publicKey), f['Q']);
         });
-      });
-      (fixtures['invalid']['fromPrivateKey'] as List).forEach((f) {
+      }
+      for (var f in (fixtures['invalid']['fromPrivateKey'] as List)) {
         test('throws ' + f['exception'], () {
           final d = HEX.decode(f['d']);
           try {
@@ -40,10 +40,10 @@ main() {
             expect((err as ArgumentError).message, f['exception']);
           }
         });
-      });
+      }
     });
     group('fromPublicKey', () {
-      (fixtures['invalid']['fromPublicKey'] as List).forEach((f) {
+      for (var f in (fixtures['invalid']['fromPublicKey'] as List)) {
         test('throws ' + f['exception'], () {
           final Q = HEX.decode(f['Q']);
           try {
@@ -52,10 +52,10 @@ main() {
             expect((err as ArgumentError).message, f['exception']);
           }
         });
-      });
+      }
     });
     group('fromWIF', () {
-      (fixtures['valid'] as List).forEach((f) {
+      for (var f in (fixtures['valid'] as List)) {
         test('imports ${f['WIF']}', () {
           final keyPair = ECPair.fromWIF(f['WIF']);
           var network = _getNetwork(f);
@@ -63,8 +63,8 @@ main() {
           expect(keyPair.compressed, f['compressed']);
           expect(keyPair.network, network);
         });
-      });
-      (fixtures['invalid']['fromWIF'] as List).forEach((f) {
+      }
+      for (var f in (fixtures['invalid']['fromWIF'] as List)) {
         test('throws ' + f['exception'], () {
           var network = _getNetwork(f);
           try {
@@ -73,15 +73,15 @@ main() {
             expect((err as ArgumentError).message, f['exception']);
           }
         });
-      });
+      }
     });
     group('toWIF', () {
-      (fixtures['valid'] as List).forEach((f) {
+      for (var f in (fixtures['valid'] as List)) {
         test('export ${f['WIF']}', () {
           final keyPair = ECPair.fromWIF(f['WIF']);
           expect(keyPair.toWIF(), f['WIF']);
         });
-      });
+      }
     });
     group('makeRandom', () {
       final d = Uint8List.fromList(List.generate(32, (i) => 4));
@@ -95,16 +95,16 @@ main() {
       test('retains the same defaults as ECPair constructor', () {
         final keyPair = ECPair.makeRandom();
         expect(keyPair.compressed, true);
-        expect(keyPair.network, NETWORKS.bitcoin);
+        expect(keyPair.network, networks.bitcoin);
       });
       test('supports the options parameter', () {
-        final keyPair = ECPair.makeRandom(compressed: false, network: NETWORKS.testnet);
+        final keyPair = ECPair.makeRandom(compressed: false, network: networks.testnet);
         expect(keyPair.compressed, false);
-        expect(keyPair.network, NETWORKS.testnet);
+        expect(keyPair.network, networks.testnet);
       });
       test('throws if d is bad length', () {
         rng(int number) {
-          return new Uint8List(28);
+          return Uint8List(28);
         }
 
         try {
@@ -115,24 +115,24 @@ main() {
       });
     });
     group('.network', () {
-      (fixtures['valid'] as List).forEach((f) {
+      for (var f in (fixtures['valid'] as List)) {
         test('return ${f['network']} for ${f['WIF']}', () {
-          NETWORKS.NetworkType? network = _getNetwork(f);
+          networks.NetworkType? network = _getNetwork(f);
           final keyPair = ECPair.fromWIF(f['WIF']);
           expect(keyPair.network, network);
         });
-      });
+      }
     });
   });
 }
 
-NETWORKS.NetworkType? _getNetwork(f) {
-  NETWORKS.NetworkType? network;
+networks.NetworkType? _getNetwork(f) {
+  networks.NetworkType? network;
   if (f['network'] != null) {
     if (f['network'] == 'bitcoin') {
-      network = NETWORKS.bitcoin;
+      network = networks.bitcoin;
     } else if (f['network'] == 'testnet') {
-      network = NETWORKS.testnet;
+      network = networks.testnet;
     }
   }
   return network;

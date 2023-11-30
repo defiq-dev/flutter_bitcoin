@@ -9,12 +9,12 @@ import 'dart:typed_data';
 
 main() {
   final fixtures =
-      json.decode(new File("./test/fixtures/p2pkh.json").readAsStringSync(encoding: utf8));
+      json.decode(File("./test/fixtures/p2pkh.json").readAsStringSync(encoding: utf8));
   group('(valid case)', () {
-    (fixtures["valid"] as List<dynamic>).forEach((f) {
+    for (var f in (fixtures["valid"] as List<dynamic>)) {
       test(f['description'] + ' as expected', () {
         final arguments = _preformPaymentData(f['arguments']);
-        final p2pkh = new P2PKH(data: arguments);
+        final p2pkh = P2PKH(data: arguments);
         if (arguments.address == null) {
           expect(p2pkh.data.address, f['expected']['address']);
         }
@@ -34,22 +34,22 @@ main() {
           expect(_toString(p2pkh.data.signature), f['expected']['signature']);
         }
       });
-    });
+    }
   });
   group('(invalid case)', () {
-    (fixtures["invalid"] as List<dynamic>).forEach((f) {
+    for (var f in (fixtures["invalid"] as List<dynamic>)) {
       test(
           'throws ' +
               f['exception'] +
               (f['description'] != null ? ('for ' + f['description']) : ''), () {
         final arguments = _preformPaymentData(f['arguments']);
         try {
-          expect(new P2PKH(data: arguments), isArgumentError);
+          expect(P2PKH(data: arguments), isArgumentError);
         } catch (err) {
           expect((err as ArgumentError).message, f['exception']);
         }
       });
-    });
+    }
   });
 }
 
@@ -64,7 +64,7 @@ PaymentData _preformPaymentData(dynamic x) {
           : null;
   final pubkey = x['pubkey'] != null ? Uint8List.fromList(HEX.decode(x['pubkey'])) : null;
   final signature = x['signature'] != null ? Uint8List.fromList(HEX.decode(x['signature'])) : null;
-  return new PaymentData(
+  return PaymentData(
       address: address,
       hash: hash,
       input: input,
