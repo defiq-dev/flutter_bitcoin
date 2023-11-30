@@ -11,11 +11,11 @@ final ZERO = Uint8List.fromList([0]);
 
 Uint8List compile(List<dynamic> chunks) {
   final bufferSize = chunks.fold(0, (acc, chunk) {
-    if (chunk is int) return (acc as int) + 1;
+    if (chunk is int) return (acc) + 1;
     if (chunk.length == 1 && asMinimalOP(chunk) != null) {
-      return (acc as int) + 1;
+      return (acc) + 1;
     }
-    return (acc as int) + pushData.encodingLength(chunk.length) + chunk.length;
+    return (acc) + pushData.encodingLength(chunk.length) + chunk.length;
   });
   var buffer = new Uint8List(bufferSize.toInt());
 

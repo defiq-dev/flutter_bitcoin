@@ -145,7 +145,7 @@ class Transaction {
 
     if ((hashType & 0x1f) != SIGHASH_SINGLE && (hashType & 0x1f) != SIGHASH_NONE) {
       var txOutsSize =
-          outs.fold(0, (sum, output) => (sum as int) + 8 + varSliceSize(output.script!));
+          outs.fold(0, (sum, output) => (sum) + 8 + varSliceSize(output.script!));
       tbuffer = new Uint8List(txOutsSize);
       bytes = tbuffer.buffer.asByteData();
       toffset = 0;
@@ -590,6 +590,7 @@ class Input {
       return new Input(
           prevOutType: SCRIPT_TYPES['P2PK'], pubkeys: [], signatures: [p2pk.data.signature!]);
     }
+    return null;
   }
 
   factory Input.clone(Input input) {
@@ -650,6 +651,7 @@ class Output {
       if (pkh1 != pkh2) throw ArgumentError('Hash mismatch!');
       return new Output(pubkeys: [ourPubKey], signatures: [null]);
     }
+    return null;
   }
 
   factory Output.clone(Output output) {
