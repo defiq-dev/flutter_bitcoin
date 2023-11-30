@@ -66,8 +66,13 @@ class P2PKH {
       payload.setRange(1, payload.length, data.hash!);
       data.address = bs58check.encode(payload);
     }
-    data.output ??=
-        bscript.compile([OPS['OP_DUP'], OPS['OP_HASH160'], data.hash, OPS['OP_EQUALVERIFY'], OPS['OP_CHECKSIG']]);
+    data.output ??= bscript.compile([
+      OPS['OP_DUP'],
+      OPS['OP_HASH160'],
+      data.hash,
+      OPS['OP_EQUALVERIFY'],
+      OPS['OP_CHECKSIG'],
+    ]);
   }
 
   void _getDataFromAddress(String address) {
