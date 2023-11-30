@@ -21,17 +21,19 @@ class ECPair {
     return _Q!;
   }
 
-  Uint8List get privateKey => _d!;
+  Uint8List? get privateKey => _d;
   String toWIF() {
     if (privateKey == null) {
       throw new ArgumentError('Missing private key');
     }
-    return wif.encode(
-        new wif.WIF(version: network!.wif, privateKey: privateKey, compressed: compressed!));
+    return wif.encode(new wif.WIF(version: network!.wif, privateKey: privateKey!, compressed: compressed!));
   }
 
   Uint8List sign(Uint8List hash) {
-    return ecc.sign(hash, privateKey);
+    if (privateKey == null) {
+      throw new ArgumentError('Missing private key');
+    }
+    return ecc.sign(hash, privateKey!);
   }
 
   bool verify(Uint8List hash, Uint8List signature) {
@@ -64,8 +66,7 @@ class ECPair {
     return new ECPair(null, publicKey, network: network, compressed: compressed);
   }
   factory ECPair.fromPrivateKey(Uint8List privateKey, {NetworkType? network, bool? compressed}) {
-    if (privateKey.length != 32)
-      throw new ArgumentError('Expected property privateKey of type Buffer(Length: 32)');
+    if (privateKey.length != 32) throw new ArgumentError('Expected property privateKey of type Buffer(Length: 32)');
     if (!ecc.isPrivate(privateKey)) throw new ArgumentError('Private key not in range [1, n)');
     return new ECPair(privateKey, null, network: network, compressed: compressed);
   }

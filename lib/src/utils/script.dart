@@ -10,8 +10,9 @@ final OP_INT_BASE = OPS['OP_RESERVED'];
 final ZERO = Uint8List.fromList([0]);
 
 Uint8List compile(List<dynamic> chunks) {
-  final bufferSize = chunks.fold(0, (acc, chunk) {
+  final bufferSize = chunks.fold<int>(0, (acc, chunk) {
     if (chunk is int) return (acc) + 1;
+    chunk as Uint8List;
     if (chunk.length == 1 && asMinimalOP(chunk) != null) {
       return (acc) + 1;
     }
@@ -170,10 +171,8 @@ Uint8List bip66encode(r, s) {
   if (lenS > 33) throw new ArgumentError('S length is too long');
   if (r[0] & 0x80 != 0) throw new ArgumentError('R value is negative');
   if (s[0] & 0x80 != 0) throw new ArgumentError('S value is negative');
-  if (lenR > 1 && (r[0] == 0x00) && r[1] & 0x80 == 0)
-    throw new ArgumentError('R value excessively padded');
-  if (lenS > 1 && (s[0] == 0x00) && s[1] & 0x80 == 0)
-    throw new ArgumentError('S value excessively padded');
+  if (lenR > 1 && (r[0] == 0x00) && r[1] & 0x80 == 0) throw new ArgumentError('R value excessively padded');
+  if (lenS > 1 && (s[0] == 0x00) && s[1] & 0x80 == 0) throw new ArgumentError('S value excessively padded');
 
   var signature = new Uint8List(6 + (lenR as int) + (lenS as int));
 

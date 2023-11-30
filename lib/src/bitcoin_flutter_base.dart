@@ -71,8 +71,7 @@ class HDWallet {
     final wallet = bip32.BIP32.fromSeed(
         seed,
         bip32.NetworkType(
-            bip32: bip32.Bip32Type(public: network.bip32.public, private: network.bip32.private),
-            wif: network.wif));
+            bip32: bip32.Bip32Type(public: network.bip32.public, private: network.bip32.private), wif: network.wif));
     final p2pkh = new P2PKH(data: new PaymentData(pubkey: wallet.publicKey), network: network);
     return HDWallet(bip32: wallet, p2pkh: p2pkh, network: network, seed: seedHex);
   }
@@ -82,8 +81,7 @@ class HDWallet {
     final wallet = bip32.BIP32.fromBase58(
         xpub,
         bip32.NetworkType(
-            bip32: bip32.Bip32Type(public: network.bip32.public, private: network.bip32.private),
-            wif: network.wif));
+            bip32: bip32.Bip32Type(public: network.bip32.public, private: network.bip32.private), wif: network.wif));
     final p2pkh = new P2PKH(data: new PaymentData(pubkey: wallet.publicKey), network: network);
     return HDWallet(bip32: wallet, p2pkh: p2pkh, network: network, seed: null);
   }
@@ -103,7 +101,7 @@ class Wallet {
   ECPair? _keyPair;
   P2PKH? _p2pkh;
 
-  String? get privKey => _keyPair != null ? HEX.encode(_keyPair!.privateKey) : null;
+  String? get privKey => _keyPair?.privateKey != null ? HEX.encode(_keyPair!.privateKey!) : null;
 
   String? get pubKey => _keyPair != null ? HEX.encode(_keyPair!.publicKey) : null;
 

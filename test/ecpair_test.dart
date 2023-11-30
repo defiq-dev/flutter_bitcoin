@@ -9,8 +9,7 @@ import '../lib/src/models/networks.dart' as NETWORKS;
 final ONE = HEX.decode('0000000000000000000000000000000000000000000000000000000000000001');
 
 main() {
-  final fixtures =
-      json.decode(new File('test/fixtures/ecpair.json').readAsStringSync(encoding: utf8));
+  final fixtures = json.decode(new File('test/fixtures/ecpair.json').readAsStringSync(encoding: utf8));
   group('ECPair', () {
     group('fromPrivateKey', () {
       test('defaults to compressed', () {
@@ -22,8 +21,7 @@ main() {
         expect(keyPair.compressed, false);
       });
       test('supports the network option', () {
-        final keyPair = ECPair.fromPrivateKey(Uint8List.fromList(ONE),
-            network: NETWORKS.testnet, compressed: false);
+        final keyPair = ECPair.fromPrivateKey(Uint8List.fromList(ONE), network: NETWORKS.testnet, compressed: false);
         expect(keyPair.network, NETWORKS.testnet);
       });
       (fixtures['valid'] as List).forEach((f) {
@@ -61,7 +59,7 @@ main() {
         test('imports ${f['WIF']}', () {
           final keyPair = ECPair.fromWIF(f['WIF']);
           var network = _getNetwork(f);
-          expect(HEX.encode(keyPair.privateKey), f['d']);
+          expect(HEX.encode(keyPair.privateKey!), f['d']);
           expect(keyPair.compressed, f['compressed']);
           expect(keyPair.network, network);
         });
