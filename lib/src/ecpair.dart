@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 import 'dart:math';
+//ignore: implementation_imports
 import 'package:bip32/src/utils/ecurve.dart' as ecc;
+//ignore: implementation_imports
 import 'package:bip32/src/utils/wif.dart' as wif;
 import 'models/networks.dart';
 

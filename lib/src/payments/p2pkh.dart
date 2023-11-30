@@ -1,20 +1,23 @@
 import 'dart:typed_data';
+
+//ignore: implementation_imports
 import 'package:bip32/src/utils/ecurve.dart' show isPoint;
 import 'package:bs58check/bs58check.dart' as bs58check;
 
 import '../crypto.dart';
 import '../models/networks.dart';
 import '../payments/index.dart' show PaymentData;
-import '../utils/script.dart' as bscript;
 import '../utils/constants/op.dart';
+import '../utils/script.dart' as bscript;
 
 class P2PKH {
-  PaymentData data;
-  late NetworkType network;
-  P2PKH({required this.data, network}) {
-    this.network = network ?? bitcoin;
+  final PaymentData data;
+  final NetworkType network;
+
+  P2PKH({required this.data, this.network = bitcoin}) {
     _init();
   }
+
   _init() {
     if (data.address != null) {
       _getDataFromAddress(data.address!);
@@ -63,8 +66,8 @@ class P2PKH {
       payload.setRange(1, payload.length, data.hash!);
       data.address = bs58check.encode(payload);
     }
-    data.output ??= bscript.compile(
-          [OPS['OP_DUP'], OPS['OP_HASH160'], data.hash, OPS['OP_EQUALVERIFY'], OPS['OP_CHECKSIG']]);
+    data.output ??=
+        bscript.compile([OPS['OP_DUP'], OPS['OP_HASH160'], data.hash, OPS['OP_EQUALVERIFY'], OPS['OP_CHECKSIG']]);
   }
 
   void _getDataFromAddress(String address) {

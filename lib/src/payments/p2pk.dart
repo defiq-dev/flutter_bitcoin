@@ -1,3 +1,4 @@
+//ignore: implementation_imports
 import 'package:bip32/src/utils/ecurve.dart' show isPoint;
 
 import '../models/networks.dart';
@@ -5,11 +6,13 @@ import '../payments/index.dart' show PaymentData;
 import '../utils/constants/op.dart';
 
 class P2PK {
-  PaymentData data;
-  late NetworkType network;
+  final PaymentData data;
+  final NetworkType network;
 
-  P2PK({required this.data, network}) {
-    this.network = network ?? bitcoin;
+  P2PK({
+    required this.data,
+    this.network = bitcoin,
+  }) {
     _init();
   }
 

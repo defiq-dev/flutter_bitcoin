@@ -1,21 +1,23 @@
 import 'dart:typed_data';
+
 import 'constants/op.dart';
 
 class DecodedPushData {
-  int? opcode;
-  int? number;
-  int? size;
-  DecodedPushData({this.opcode, this.number, this.size});
+  final int? opcode;
+  final int? number;
+  final int? size;
+
+  const DecodedPushData({this.opcode, this.number, this.size});
 }
 
 class EncodedPushData {
-  int? size;
-  Uint8List? buffer;
+  final int? size;
+  final Uint8List? buffer;
 
-  EncodedPushData({this.size, this.buffer});
+  const EncodedPushData({this.size, this.buffer});
 }
 
-EncodedPushData? encode(Uint8List buffer, number, offset) {
+EncodedPushData? encode(Uint8List buffer, int number, int offset) {
   var size = encodingLength(number);
   // ~6 bit
   if (size == 1) {
@@ -74,8 +76,8 @@ DecodedPushData? decode(Uint8List bf, int offset) {
   return DecodedPushData(opcode: opcode, number: number, size: size);
 }
 
-int encodingLength(i) {
-  return i < OPS['OP_PUSHDATA1']
+int encodingLength(int i) {
+  return i < OPS['OP_PUSHDATA1']!
       ? 1
       : i <= 0xff
           ? 2

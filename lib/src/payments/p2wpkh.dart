@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+//ignore: implementation_imports
 import 'package:bip32/src/utils/ecurve.dart' show isPoint;
 import 'package:bech32/bech32.dart';
 
@@ -11,12 +12,13 @@ import '../utils/constants/op.dart';
 class P2WPKH {
   final EMPTY_SCRIPT = Uint8List.fromList([]);
 
-  PaymentData data;
-  late NetworkType network;
+  final PaymentData data;
+  final NetworkType network;
 
-  P2WPKH({required this.data, network}) {
-    this.network = network ?? bitcoin;
-    data = data;
+  P2WPKH({
+    required this.data,
+    this.network = bitcoin,
+  }) {
     _init();
   }
 
@@ -25,7 +27,9 @@ class P2WPKH {
         data.hash == null &&
         data.output == null &&
         data.pubkey == null &&
-        data.witness == null) throw ArgumentError('Not enough data');
+        data.witness == null) {
+      throw ArgumentError('Not enough data');
+    }
 
     if (data.address != null) {
       _getDataFromAddress(data.address!);
@@ -36,9 +40,7 @@ class P2WPKH {
     }
 
     if (data.output != null) {
-      if (data.output!.length != 22 ||
-          data.output![0] != OPS['OP_0'] ||
-          data.output![1] != 20) {
+      if (data.output!.length != 22 || data.output![0] != OPS['OP_0'] || data.output![1] != 20) {
         // 0x14
         throw ArgumentError('Output is invalid');
       }
