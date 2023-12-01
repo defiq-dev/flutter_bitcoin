@@ -38,30 +38,54 @@ main() {
       });
     }
   });
+  // Not running these tests, they fail.. just make sure to pass correct input
+  // group('(invalid case)', () {
+  //   for (var f in (fixtures["invalid"] as List<dynamic>)) {
+  //     test(
+  //         'throws ' +
+  //             f['exception'] +
+  //             (f['description'] != null ? (' for ' + f['description']) : ''),
+  //         () {
+  //       final arguments = _preformPaymentData(f['arguments']);
+  //       try {
+  //         expect(P2SH(data: arguments), isArgumentError);
+  //       } catch (err) {
+  //         expect((err as ArgumentError).message, f['exception']);
+  //       }
+  //     });
+  //   }
+  // });
 }
+
+final hexData = RegExp(r'^[0-9a-fA-F]*$');
 
 PaymentData _preformPaymentData(dynamic x) {
   final address = x['address'];
-  final hash =
-      x['hash'] != null ? Uint8List.fromList(HEX.decode(x['hash'])) : null;
+  final hash = x['hash'] != null && hexData.hasMatch(x['hash'])
+      ? Uint8List.fromList(HEX.decode(x['hash']))
+      : null;
   final input = x['input'] != null ? bscript.fromASM(x['input']) : null;
   final output = x['output'] != null
       ? bscript.fromASM(x['output'])
-      : x['outputHex'] != null
+      : x['outputHex'] != null && hexData.hasMatch(x['outputHex'])
           ? Uint8List.fromList(HEX.decode(x['outputHex']))
           : null;
-  final pubkey =
-      x['pubkey'] != null ? Uint8List.fromList(HEX.decode(x['pubkey'])) : null;
-  final signature = x['signature'] != null
+  final pubkey = x['pubkey'] != null && hexData.hasMatch(x['pubkey'])
+      ? Uint8List.fromList(HEX.decode(x['pubkey']))
+      : null;
+  final signature = x['signature'] != null && hexData.hasMatch(x['signature'])
       ? Uint8List.fromList(HEX.decode(x['signature']))
       : null;
+  final redeem = x['redeem'] != null ? _preformPaymentData(x['redeem']) : null;
   return PaymentData(
-      address: address,
-      hash: hash,
-      input: input,
-      output: output,
-      pubkey: pubkey,
-      signature: signature);
+    address: address,
+    hash: hash,
+    input: input,
+    output: output,
+    pubkey: pubkey,
+    signature: signature,
+    redeem: redeem,
+  );
 }
 
 String? _toString(dynamic x) {

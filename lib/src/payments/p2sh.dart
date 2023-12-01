@@ -6,6 +6,8 @@ import 'package:flutter_bitcoin/flutter_bitcoin.dart';
 import '../utils/constants/op.dart';
 import '../utils/script.dart' as bscript;
 
+import '../crypto.dart' as bcrypto;
+
 class P2SH {
   final PaymentData data;
   final NetworkType network;
@@ -27,11 +29,19 @@ class P2SH {
       if (!isValidOutput(data.output!)) {
         throw ArgumentError("Output is invalid");
       }
-      data.hash = data.output!.sublist(2, 22);
+      final hash = data.output!.sublist(2, 22);
+      if (data.hash != null && hash != data.hash) {
+        throw ArgumentError("Hash mismatch");
+      }
+      data.hash = hash;
       _getDataFromHash();
     } else if (data.input != null) {
-      List<dynamic> chunks = bscript.decompile(data.input) ?? [];
-      _getDataFromChunk(chunks);
+      _getDataFromInput();
+      _getDataFromRedeem();
+      _getDataFromHash();
+    } else if (data.redeem != null) {
+      _getDataFromRedeem();
+      _getDataFromHash();
     } else {
       throw ArgumentError("Not enough data");
     }
@@ -45,7 +55,13 @@ class P2SH {
     if (version != network.scriptHash) {
       throw ArgumentError('Invalid version or Network mismatch');
     }
-    data.hash = payload.sublist(1);
+
+    final hash = payload.sublist(1);
+    if (data.hash != null && hash != data.hash) {
+      throw ArgumentError("Hash mismatch");
+    }
+
+    data.hash = hash;
     if (data.hash!.length != 20) {
       throw ArgumentError('Invalid address');
     }
@@ -67,7 +83,49 @@ class P2SH {
     ]);
   }
 
-  void _getDataFromChunk([List? chunks]) {}
+  void _getDataFromInput() {
+    assert(data.input != null);
+
+    data.witness ??= [];
+    List<dynamic> chunks = bscript.decompile(data.input) ?? [];
+
+    if (chunks.isEmpty) {
+      throw ArgumentError("Input too short");
+    }
+
+    final lastChunk = chunks[chunks.length - 1];
+    data.redeem = PaymentData(
+      output: lastChunk == OPS['OPS_FALSE']
+          ? Uint8List(0)
+          : lastChunk is Uint8List
+              ? lastChunk
+              : null,
+      input: bscript.compile(chunks.sublist(0, chunks.length - 1)),
+      witness: data.witness,
+    );
+  }
+
+  void _getDataFromRedeem() {
+    assert(data.redeem != null);
+
+    if (data.hash == null && data.redeem!.output != null) {
+      final hash = bcrypto.hash160(data.redeem!.output!);
+      if (data.hash != null && hash != data.hash) {
+        throw ArgumentError("Hash mismatch");
+      }
+
+      data.hash = hash;
+
+      if (data.input == null && data.redeem!.input != null) {
+        data.input = bscript.compile([
+          ...(bscript.decompile(data.redeem!.input!) ?? []),
+          data.redeem!.output!,
+        ]);
+      }
+    }
+
+    data.witness ??= data.redeem!.witness;
+  }
 }
 
 isValidOutput(Uint8List data) {

@@ -8,6 +8,7 @@ class PaymentData {
   Uint8List? pubkey;
   Uint8List? input;
   List<Uint8List>? witness;
+  PaymentData? redeem;
 
   PaymentData({
     this.address,
@@ -17,10 +18,11 @@ class PaymentData {
     this.input,
     this.signature,
     this.witness,
+    this.redeem,
   });
 
   @override
   String toString() {
-    return 'PaymentData{address: $address, hash: $hash, output: $output, signature: $signature, pubkey: $pubkey, input: $input, witness: $witness}';
+    return 'PaymentData{address: $address, hash: $hash, output: $output, signature: $signature, pubkey: $pubkey, input: $input, witness: $witness, redeem: $redeem}';
   }
 }
